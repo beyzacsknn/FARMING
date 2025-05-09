@@ -13,24 +13,21 @@ const { ReadlineParser } = require('@serialport/parser-readline');
 
 const app = express();
 app.use(cors({
-  origin: '*', // Tüm origin'lere geçici izin
+  origin: '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.json());
 
-// ENV
 const PORT = process.env.PORT || 3000;
 const MONGO_URI = process.env.MONGO_URI;
 const JWT_SECRET = process.env.JWT_SECRET;
 
-// MongoDB bağlantısı
 mongoose.connect(MONGO_URI)
   .then(() => console.log('MongoDB bağlantısı başarılı'))
   .catch(err => console.error('MongoDB bağlantı hatası:', err));
 
-// ------------------------ AUTH ROUTES ------------------------
-// ... (Auth routes aynen kalabilir) ...
+
 
 app.post('/register', async (req, res) => {
   try {
@@ -110,7 +107,6 @@ app.get('/user', async (req, res) => {
     res.status(500).json({ message: 'Sunucu hatası' });
   }
 });
-// ------------------------ SENSOR DATA ------------------------
 
 let sensorData = {
   temperature: "",
@@ -151,7 +147,6 @@ parser.on('data', (line) => {
   io.emit("sensorData", sensorData);
 });
 
-// Socket.io
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
@@ -162,9 +157,9 @@ const io = socketIo(server, {
 
 io.on('connection', (socket) => {
   console.log('Yeni bir kullanıcı bağlandı!');
-  socket.emit('sensorData', sensorData); // Başlangıç verisini gönder
+  socket.emit('sensorData', sensorData); 
 });
-// server.listen kısmını şu şekilde değiştirin:
+
 server.listen(PORT, '0.0.0.0', () => {
   console.log(`Server http://10.70.37.88:${PORT} adresinde çalışıyor`);
 });
